@@ -74,10 +74,9 @@ class ArticlesControllerTest extends TestCase
 
         $this->followingRedirects();
 
-        $this->patch(route('articles.destroy', [
+        $this->patch(route('articles.update', [
             'article' => $article,
         ]), [
-            'id' => $article->id,
             'title' => 'Modified title',
             'content' => 'Modified content'
         ])
