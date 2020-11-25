@@ -21,7 +21,7 @@ class ArticlesController extends Controller
 
     public function store(Request $request)
     {
-        auth()->user()->articles()->save(Article::make($request->all()));
+        auth()->user()->articles()->create($request->all());
 
         return redirect()->route('articles.index');
     }
@@ -35,6 +35,8 @@ class ArticlesController extends Controller
 
     public function edit(Article $article)
     {
+        $this->authorize('update', $article);
+
         return view('articles.edit', [
             'article' => $article
         ]);
@@ -42,6 +44,8 @@ class ArticlesController extends Controller
 
     public function update(Request $request, Article $article)
     {
+        $this->authorize('update', $article);
+
         $article->update($request->all());
 
         return redirect()->route('articles.edit', ['article' => $article]);
@@ -49,6 +53,8 @@ class ArticlesController extends Controller
 
     public function destroy(Article $article)
     {
+        $this->authorize('delete', $article);
+
         $article->delete();
 
         return redirect()->route('articles.index');

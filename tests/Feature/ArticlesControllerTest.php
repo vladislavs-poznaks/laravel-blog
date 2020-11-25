@@ -33,7 +33,7 @@ class ArticlesControllerTest extends TestCase
     }
 
     /** @test */
-    public function user_can_delete_an_article()
+    public function user_can_soft_delete_an_article()
     {
         $user = User::factory()->create();
         $this->actingAs($user);
@@ -55,7 +55,7 @@ class ArticlesControllerTest extends TestCase
         ]))
             ->assertStatus(200);
 
-        $this->assertDatabaseMissing('articles', [
+        $this->assertSoftDeleted('articles', [
             'user_id' => $user->id,
             'title' => $article->title,
             'content' => $article->content
@@ -153,5 +153,92 @@ class ArticlesControllerTest extends TestCase
             ->assertStatus(200)
             ->assertSee($article->title)
             ->assertSee($article->content);
+    }
+
+    /** @test */
+    public function guest_cannot_view_article_create_page()
+    {
+        $this->get(route('articles.create'))
+            ->assertStatus(302)
+            ->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function guest_cannot_create_article()
+    {
+        $this->post(route('articles.store'), [
+            'title' => 'Test Title',
+            'content' => 'Test Content'
+        ])
+            ->assertStatus(302)
+            ->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function guest_cannot_view_article_edit_article()
+    {
+        $article = Article::factory()->create();
+
+        $this->get(route('articles.edit', [
+            'article' => $article
+        ]))
+            ->assertStatus(302)
+            ->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function guest_cannot_update_article()
+    {
+        $article = Article::factory()->create();
+
+        $this->patch(route('articles.update', [
+            'article' => $article
+        ]), [
+            'title' => 'Modified title',
+            'content' => 'Modified content'
+        ])
+            ->assertStatus(302)
+            ->assertRedirect(route('login'));
+    }
+
+    /** @test */
+    public function guest_cannot_delete_article()
+    {
+        $article = Article::factory()->create();
+
+        $this->delete(route('articles.destroy', [
+            'article' => $article,
+        ]))
+            ->assertStatus(302)
+            ->assertRedirect(route('login'));
+
+        $this->assertDatabaseHas('articles', [
+           'title' => $article->title,
+           'content' => $article->content
+        ]);
+    }
+
+    /** @test */
+    public function article_owner_can_not_be_overwritten()
+    {
+        $user = User::factory()->create([
+            'id' => 1
+        ]);
+        $this->actingAs($user);
+
+        $this->followingRedirects();
+
+        $this->post(route('articles.store'), [
+            'user_id' => 2,
+            'title' => 'Test Title',
+            'content' => 'Test Content'
+        ])
+            ->assertStatus(200);
+
+        $this->assertDatabaseHas('articles', [
+            'user_id' => $user->id,
+            'title' => 'Test Title',
+            'content' => 'Test Content'
+        ]);
     }
 }

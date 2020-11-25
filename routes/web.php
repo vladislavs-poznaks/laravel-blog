@@ -22,4 +22,9 @@ Auth::routes();
 
 Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
-Route::resource('articles', ArticlesController::class);
+Route::resource('articles', ArticlesController::class)
+    ->middleware('auth')
+    ->except(['index', 'show']);
+
+Route::resource('articles', ArticlesController::class)
+    ->only(['index', 'show']);

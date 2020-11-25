@@ -1,7 +1,8 @@
 @extends('layouts.app')
+
 @section('content')
     <div class="container">
-        <a href="{{ route('articles.index') }}" class="btn btn-primary btn-sm">
+        <a href="{{ route('articles.index') }}" class="btn btn-primary btn-sm mb-4">
             Back
         </a>
         <div>
