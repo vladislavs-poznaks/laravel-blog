@@ -8,6 +8,10 @@
                 <label for="title">Title</label>
                 <input type="text" class="form-control" id="title" name="title" placeholder="Title..">
             </div>
+{{--            <div>--}}
+{{--                <label for="title-disable">Disable Title Input</label>--}}
+{{--                <input type="checkbox" id="title-input" name="title-input" onchange="disableTitle()">--}}
+{{--            </div>--}}
             <div class="form-group">
                 <label for="content">Content</label>
                 <div class="form-group">
@@ -17,4 +21,13 @@
             <button type="submit" class="btn btn-primary">Post</button>
         </form>
     </div>
+    <script type="text/javascript">
+        const disableTitle = () => {
+            if (document.getElementById('title').disabled) {
+                document.getElementById('title').disabled = false
+            } else {
+                document.getElementById('title').disabled = true
+            }
+        }
+    </script>
 @endsection

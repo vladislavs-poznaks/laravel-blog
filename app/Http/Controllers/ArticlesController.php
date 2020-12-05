@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ArticleCreated;
 use App\Models\Article;
 use Illuminate\Http\Request;
 
@@ -9,8 +10,10 @@ class ArticlesController extends Controller
 {
     public function index()
     {
+        $articles = Article::all()->sortByDesc('created_at');
+
         return view('articles.index', [
-            'articles' => Article::all()
+            'articles' => $articles
         ]);
     }
 
@@ -21,7 +24,9 @@ class ArticlesController extends Controller
 
     public function store(Request $request)
     {
-        auth()->user()->articles()->create($request->all());
+        $article = auth()->user()->articles()->create($request->all());
+
+        event(new ArticleCreated($article));
 
         return redirect()->route('articles.index');
     }

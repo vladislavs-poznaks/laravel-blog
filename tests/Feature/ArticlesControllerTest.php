@@ -213,8 +213,8 @@ class ArticlesControllerTest extends TestCase
             ->assertRedirect(route('login'));
 
         $this->assertDatabaseHas('articles', [
-           'title' => $article->title,
-           'content' => $article->content
+            'title' => $article->title,
+            'content' => $article->content
         ]);
     }
 
@@ -240,5 +240,27 @@ class ArticlesControllerTest extends TestCase
             'title' => 'Test Title',
             'content' => 'Test Content'
         ]);
+    }
+
+    /** @test */
+    public function article_count_is_updated_when_article_is_created()
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user);
+
+        //$this->followingRedirects();
+
+        $this->post(route('articles.store'), [
+            'title' => 'Test Title',
+            'content' => 'Test Content'
+        ]);
+
+        $this->assertDatabaseHas('users', [
+           'id' => $user->id,
+           'articles_count' => 1
+        ]);
+
+        $this->assertEquals(1, $user->refresh()->articles_count);
     }
 }
